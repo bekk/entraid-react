@@ -1,6 +1,7 @@
 ## Next med entra id (azure ad) og next-auth
 Dette er en enkel applikasjon som henter ut 'employeeId' for den innloggede.
 Dersom man ikke er logget inn, blir man alltid redirectet til login-siden.
+NB: sett opp environment variabler som kan sees nederst i README.md
 
 
 ### \[...nextauth]/route.ts
@@ -20,3 +21,17 @@ Her sender man session til SessionProvider, som man da senere kan hente ut med u
 
 ### info/page.tsx
 Her demonstreres at det er mulig å hente en session med useSession()
+
+
+### .env.local
+Man må også ha følgende environment variabler
+```.env
+#Entra ID
+AZURE_AD_CLIENT_ID=
+AZURE_AD_TENANT_ID=
+AZURE_AD_CLIENT_SECRET=
+
+#NextAuth
+NEXTAUTH_URL=
+NEXTAUTH_SECRET=
+```
