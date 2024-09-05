@@ -5,12 +5,18 @@ Dersom man ikke er logget inn, blir man alltid redirectet til login-siden.
 
 ### \[...nextauth]/route.ts
 Her er all logikken for hvordan man får tak i id_token, som inneholder 'employeeId'.
+
+##### jwt callback
 Først verifiseres tokenet, og deretter hentes 'employeeId' ut fra tokenet.
 
-I session callbacken lagres denne verdien inn i et Session objekt som man senere kan få tak i med getServerSession() på serverside, eller getSession() på klientside.
+##### session callback
+I session callbacken lagres employeeid som ble hentet ut i jwt callback inn i et Session objekt som man senere kan få tak i med getServerSession() på serverside, eller getSession() på klientside.
 
-### page.tsx
+### app/page.tsx
 Her hentes en session ut med getServerSession, og denne session blir sendt med til Providers.
 
 ### Providers.tsx
-Her tas session opp 
+Her sender man session til SessionProvider, som man da senere kan hente ut med useSession.
+
+### info/page.tsx
+Her demonstreres at det er mulig å hente en session med useSession()
