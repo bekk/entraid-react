@@ -1,5 +1,5 @@
-import NextAuth, {AuthOptions, DefaultSession, DefaultUser} from "next-auth"
-import { JWT } from "next-auth/jwt"
+import NextAuth, {AuthOptions, DefaultSession} from "next-auth"
+import {JWT} from "next-auth/jwt"
 import AzureADProvider from "next-auth/providers/azure-ad";
 import jwt from "jsonwebtoken";
 
@@ -10,7 +10,7 @@ declare module 'next-auth' {
 }
 
 // Extend the built-in session and user types
-export const authOptions : AuthOptions = {
+export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
       clientId: process.env.AZURE_AD_CLIENT_ID || '',
@@ -19,18 +19,23 @@ export const authOptions : AuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account}: { token: JWT; account: any; profile?: any }) {
+    async jwt({token, account}: { token: JWT; account: any; profile?: any }) {
       if (account && account.id_token) {
-        // Decode the id_token to get the claims
-        const id_token = jwt.decode(account.id_token) as { [key: string]: any };
-        const employeeId = id_token?.employeeId;
+        const clientSecret = process.env.AZURE_AD_CLIENT_SECRET;
+        if (!clientSecret) {
+          throw new Error("AZURE_AD_CLIENT_SECRET is not defined");
+        }
+        // Verify the id_token to ensure it is valid and not tampered with
+        const verifiedToken = jwt.verify(account.id_token, clientSecret) as { [key: string]: any };
+        const employeeId = verifiedToken?.employeeId;
         token.employeeId = null;
-        if (employeeId)
+        if (employeeId) {
           token.employeeId = employeeId;
+        }
       }
       return token;
     },
-    async session({ session, token }: { session: any; token: JWT }) {
+    async session({session, token}: { session: any; token: JWT }) {
       session.employeeId = null;
       if (token && token.employeeId)
         session.employeeId = token.employeeId;
@@ -44,4 +49,4 @@ export const authOptions : AuthOptions = {
 
 const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST }
+export {handler as GET, handler as POST}
