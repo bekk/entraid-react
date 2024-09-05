@@ -1,10 +1,11 @@
 'use client'
 
 import {useSession} from "next-auth/react";
+import {Session} from "next-auth";
 
 export default function Info() {
-  const session = useSession()
-  console.log('gettin that session in a client component', session)
+  const { data } = useSession()
+  console.log('gettin that session in a client component', data?.employeeId)
   return (
     <div>
       <h1>

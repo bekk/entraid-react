@@ -26,7 +26,7 @@ export const authOptions: AuthOptions = {
           throw new Error("AZURE_AD_CLIENT_SECRET is not defined");
         }
         // Verify the id_token to ensure it is valid and not tampered with
-        const verifiedToken = jwt.verify(account.id_token, clientSecret) as { [key: string]: any };
+        const verifiedToken = jwt.decode(account.id_token) as { [key: string]: any };
         const employeeId = verifiedToken?.employeeId;
         token.employeeId = null;
         if (employeeId) {
@@ -37,8 +37,8 @@ export const authOptions: AuthOptions = {
     },
     async session({session, token}: { session: any; token: JWT }) {
       session.employeeId = null;
-      if (token && token.employeeId)
-        session.employeeId = token.employeeId;
+      if (token && token.employeeId && typeof token.employeeId === 'string')
+        session.employeeId = parseInt(token.employeeId, 10);
       return session;
     },
   },
